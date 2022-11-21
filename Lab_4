@@ -1,0 +1,119 @@
+Дані для цієї лабораторної роботи взяті з «https://www.kaggle.com/benhamner/nips-2015-papers» 
+Для виконання роботи необхідно завантажити файл бази даних SQLite за посиланням: «https://www.dropbox.com/s/pf2htfcrdoqh3ii/database.sqlite?dl=0». 
+В цьому файлі містяться дані по доповідям на Neural Information Processing Systems (NIPS) яка є однією з ведучих конференцій по машинному навчанню в світі.
+
+install.packages("RSQLite")
+library(RSQLite)
+
+install.packages("DBI")
+library(DBI)
+
+conn <- dbConnect(RSQLite::SQLite(), "/Users/user/Downloads/database.sqlite")
+res <- dbSendQuery(conn, "SELECT Name as Author FROM Authors ORDER BY Name")
+df <- dbFetch(res, n=10)
+dbClearResult(res)
+dbDisconnect(conn)
+
+ df
+               Author
+1       ABHISEK KUNDU
+2      Aaditya Ramdas
+3  Aaron C. Courville
+4         Aaron Klein
+5          Aaron Roth
+6         Aarti Singh
+7   Abbas Abdolmaleki
+8  Abhradeep Thakurta
+9          Adam Smith
+10      Adarsh Prasad
+________________________________
+1. Необхідно створити фрейм даних: 
+Назва статті (Title), тип виступу (EventType).
+Необхідно вибрати тільки статті з типом виступу Spotlight. Сортування по назві статті.
+
+
+sample1 <- dbSendQuery(conn, "SELECT Title, EventType 
++                                   FROM Papers 
++                                   WHERE EventType='Spotlight' 
++                                   ORDER BY Title")
+data1 <- dbFetch(sample1 , n=10)
+data1
+                                                                                          Title EventType
+1  A Tractable Approximation to Optimal Point Process Filtering: Application to Neural Encoding Spotlight
+2                                    Accelerated Mirror Descent in Continuous and Discrete Time Spotlight
+3                        Action-Conditional Video Prediction using Deep Networks in Atari Games Spotlight
+4                                                                      Adaptive Online Learning Spotlight
+5                          Asynchronous Parallel Stochastic Gradient for Nonconvex Optimization Spotlight
+6                                                 Attention-Based Models for Speech Recognition Spotlight
+7                                                       Automatic Variational Inference in Stan Spotlight
+8                                   Backpropagation for Energy-Efficient Neuromorphic Computing Spotlight
+9                       Bandit Smooth Convex Optimization: Improving the Bias-Variance Tradeoff Spotlight
+10                         Biologically Inspired Dynamic Textures for Probing Motion Perception Spotlight
+
+
+
+2. Ім’я автора (Name), Назва статті (Title).
+Необхідно вивести всі назви статей для автора «Josh Tenenbaum». 
+Сортування по назві статті.
+
+
+sample2 <- dbSendQuery(conn, "SELECT Name, Title 
+                                FROM Authors as x inner join PaperAuthors as y on x.id=y.Authorid
+                                inner join Papers as z on z.id=y.Paperid  
+                                WHERE Name='Josh Tenenbaum'
+                                ORDER BY Title")
+                                
+data2 <- dbFetch(sample2 , n=10)
+data2            Name                                                                                             Title
+1 Josh Tenenbaum                                                       Deep Convolutional Inverse Graphics Network
+2 Josh Tenenbaum Galileo: Perceiving Physical Object Properties by Integrating a Physics Engine with Deep Learning
+3 Josh Tenenbaum                                                Softstar: Heuristic-Guided Probabilistic Inference
+4 Josh Tenenbaum                                                        Unsupervised Learning by Program Synthesis  
+
+
+
+3. Необхідно створити фрейм даних. 
+ Вибрати всі назви статей (Title), в яких є слово «statistical». 
+ Сортування по назві статті.
+
+
+sample3 <- dbSendQuery(conn, "SELECT Title
+                                 FROM Papers 
+                                 WHERE Title LIKE '%statistical%' 
+                                 ORDER BY Title")
+data3 <- dbFetch(sample3, n=10)
+data3
+                                                                                 Title
+1 Adaptive Primal-Dual Splitting Methods for Statistical Learning and Image Processing
+2                                Evaluating the statistical significance of biclusters
+3                  Fast Randomized Kernel Ridge Regression with Statistical Guarantees
+4     High Dimensional EM Algorithm: Statistical Optimization and Asymptotic Normality
+5                Non-convex Statistical Optimization for Sparse Tensor Graphical Model
+6            Regularized EM Algorithms: A Unified Framework and Statistical Guarantees
+7                            Statistical Model Criticism using Kernel Two Sample Tests
+
+4. 
+Ім’я автору (Name), кількість статей по кожному автору (NumPapers). 
+Сортування по кількості статей від більшої кількості до меньшої.
+
+
+sample3 <- dbSendQuery(conn, "SELECT Name, COUNT (Title) AS NumPapers
++                               FROM Authors as x
++                               INNER JOIN PaperAuthors as y ON x.Id = y.AuthorID 
++                               INNER JOIN Papers as z ON y.PaperId = z.Id
++                               GROUP BY Name
++                               ORDER BY NumPapers DESC")
+
+data3 <- dbFetch(sample3, n=10)
+> data3
+                   Name NumPapers
+1  Pradeep K. Ravikumar         7
+2        Lawrence Carin         6
+3               Han Liu         6
+4     Zoubin Ghahramani         5
+5               Le Song         5
+6   Inderjit S. Dhillon         5
+7          Zhaoran Wang         4
+8         Yoshua Bengio         4
+9  Simon Lacoste-Julien         4
+10          Shie Mannor         4

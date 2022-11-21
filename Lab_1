@@ -1,0 +1,79 @@
+1. 
+1) Downlod file
+
+url<-"https://data.gov.ua/dataset/175386f8-fbce-4352-8ec9-44fc8c436aa9/resource/e58e005a-c448-4d97-9d45-813f05b1d737/download/nabir-2020-2022-roki.xls"
+download.file(url, destfile="./forecast.xlsx", mode='wb')
+
+2)Read file
+
+install.packages("readxl")
+library(readxl)
+df<-read_excel("Users/user/Downloads/forecast.xls", sheet=1)
+df
+
+df<-read_excel("Users/user/Downloads/forecast.xls", sheet=1)
+> df
+# A tibble: 10 x 8
+   `№ з/п` Показник `Прогноз 2020 с~ `Прогноз 2020 с~ `Прогноз 2021 с~ `Прогноз 2021 с~
+     <dbl> <chr>    <chr>            <chr>            <chr>            <chr>           
+ 1       1 Валовий~ 4510.8000000000~ 4 598,8          5 041,6          5 206,9         
+ 2       2 Валовий~ 103.7            104.8            103.8            105.5           
+ 3       3 Індекс ~ 106.40000000000~ 106.59999999999~ 105.59999999999~ 105.5           
+ 4       4 Індекс ~ 105.5            105.8            105.3            105             
+ 5       5 Індекс ~ 108.2            109              108              108             
+ 6       6 Прибуто~ 937.60000000000~ 942.39999999999~ 1 050,9          1080.5          
+ 7       7 Фонд оп~ 1352.2           1 374,8          1 528,9          1 600,6         
+ 8       8 Середнь~ 12497            12552            14187            14692           
+ 9       9 Середнь~ 110.09999999999~ 110.40000000000~ 107.5            110.90000000000~
+10      10 Кількіс~ 16.510000000000~ 16.780000000000~ 16.609999999999~ 16.920000000000~
+
+
+2. 
+1) Download csv file
+
+fileurl<-("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv")
+download.file(fileurl, destfile="./getdata.csv", mode='wb')
+
+2)
+
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv"
+df <- read.csv(fileUrl)
+df
+
+3)count properties with value more then 1000000
+
+> subset_1<-subset(df, VAL==24)
+> nrow(subset_1)
+53
+
+sum(df$VAL==24 & !is.na(df$VAL))
+53
+
+3. 
+
+1) Download xml file
+
+library(xml2)
+pg <- read_xml("http://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml")
+
+2) Convert xml to dataframe
+
+doc <- as_list(pg)
+str(doc$response, 1)
+
+library(tidyr)
+dat<- tibble::as_tibble(doc) %>%
+  # new tidyr function
+  unnest_wider(response) %>%
+  # unnest same length list cols
+  unnest(cols = names(.)) %>%
+  unnest(cols = names(.)) %>%
+  # convert using readr parser
+ readr::type_convert()
+ 
+ 3) Transpose dataframe
+ 
+dat_transpose <- as.data.frame(t(as.matrix(dat)))
+ 
+sum(dat_transpose$V2==21231 & !is.na(dat_transpose$V2))
+127
